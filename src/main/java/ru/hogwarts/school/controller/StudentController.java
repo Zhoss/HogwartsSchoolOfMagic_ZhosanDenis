@@ -49,12 +49,9 @@ public class StudentController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Student> deleteStudent(@PathVariable long id) {
-        Student deletedStudent = this.service.deleteStudent(id);
-        if (deletedStudent == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(deletedStudent);
+    public ResponseEntity deleteStudent(@PathVariable long id) {
+        this.service.deleteStudent(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("age/{age}")
