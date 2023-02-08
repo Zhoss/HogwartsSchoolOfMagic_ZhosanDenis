@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestParam;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
@@ -61,6 +63,20 @@ public class StudentController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(studentsByAge);
+    }
+
+    @GetMapping("age")
+    public ResponseEntity<Collection<Student>> getStudentsByAgeBetween(@RequestParam int min, @RequestParam int max) {
+        return ResponseEntity.ok(this.service.getStudentsByAgeBetween(min, max));
+    }
+
+    @GetMapping("faculty")
+    public ResponseEntity<Faculty> getFacultyOfTheStudent(@RequestParam String name) {
+        Faculty faculty = this.service.getFacultyOfTheStudent(name);
+        if (faculty == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(this.service.getFacultyOfTheStudent(name));
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)

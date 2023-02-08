@@ -1,6 +1,7 @@
 package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
@@ -47,5 +48,19 @@ public class StudentService {
             throw new IllegalArgumentException("Требуется указать корректный возраст студента");
         }
         return this.studentRepository.findByAge(age);
+    }
+
+    public Collection<Student> getStudentsByAgeBetween(int min, int max) {
+        if (min > max || max < 0 || max >= 700) {
+            throw new IllegalArgumentException("Требуется указать корректные границы возраста студентов");
+        }
+        return this.studentRepository.findStudentsByAgeBetween(min, max);
+    }
+
+    public Faculty getFacultyOfTheStudent(String name) {
+        if (name == null || name.isEmpty() || name.isBlank()) {
+            throw new IllegalArgumentException("Требуется указать корректное имя студента");
+        }
+        return this.studentRepository.getByNameIgnoreCase(name).getFaculty();
     }
 }

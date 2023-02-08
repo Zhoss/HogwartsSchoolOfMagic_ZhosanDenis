@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
@@ -56,12 +57,29 @@ public class FacultyController {
     }
 
     @GetMapping("color")
-    public ResponseEntity<Collection<Faculty>> getFacultiesByColor(@RequestParam String color) {
-        Collection<Faculty> facultiesByColor = this.service.getFacultiesByColor(color);
-        if (facultiesByColor.isEmpty()) {
+    public ResponseEntity<Faculty> getFacultyByColorOrName(@RequestParam(required = false) String color,
+                                                           @RequestParam(required = false) String name) {
+        if (color != null) {
+            if (this.service.getFacultyByColor(color) == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(this.service.getFacultyByColor(color));
+        }
+        if (name != null) {
+            if (this.service.getFacultyByName(name) == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(this.service.getFacultyByName(name));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("students")
+    public ResponseEntity<Collection<Student>> findAllStudents(String name) {
+        if (this.service.findAllStudents(name).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(facultiesByColor);
+        return ResponseEntity.ok(this.service.findAllStudents(name));
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)

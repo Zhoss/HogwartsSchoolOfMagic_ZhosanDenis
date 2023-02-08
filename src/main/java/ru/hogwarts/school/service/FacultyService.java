@@ -2,6 +2,7 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.Collection;
@@ -42,10 +43,24 @@ public class FacultyService {
         this.facultyRepository.deleteById(id);
     }
 
-    public Collection<Faculty> getFacultiesByColor(String color) {
-        if (color == null || color.isEmpty() || color.isBlank()) {
+    public Faculty getFacultyByColor(String color) {
+        if (color.isEmpty() || color.isBlank()) {
             throw new IllegalArgumentException("Требуется указать корректный цвет факультета");
         }
-        return this.facultyRepository.findByColor(color);
+        return this.facultyRepository.findByColorIgnoreCase(color);
+    }
+
+    public Faculty getFacultyByName(String name) {
+        if (name.isEmpty() || name.isBlank()) {
+            throw new IllegalArgumentException("Требуется указать корректное имя факультета");
+        }
+        return this.facultyRepository.findByNameIgnoreCase(name);
+    }
+
+    public Collection<Student> findAllStudents(String name) {
+        if (name == null || name.isEmpty() || name.isBlank()) {
+            throw new IllegalArgumentException("Требуется указать корректное имя факультета");
+        }
+        return this.facultyRepository.findByNameIgnoreCase(name).getAllStudents();
     }
 }
