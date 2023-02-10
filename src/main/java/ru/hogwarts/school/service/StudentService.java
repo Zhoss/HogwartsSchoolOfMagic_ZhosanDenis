@@ -51,16 +51,16 @@ public class StudentService {
     }
 
     public Collection<Student> getStudentsByAgeBetween(int min, int max) {
-        if (min > max || max < 0 || max >= 700) {
+        if (min > max || max < 0 || max > 18) {
             throw new IllegalArgumentException("Требуется указать корректные границы возраста студентов");
         }
         return this.studentRepository.findStudentsByAgeBetween(min, max);
     }
 
-    public Faculty getFacultyOfTheStudent(String name) {
-        if (name == null || name.isEmpty() || name.isBlank()) {
+    public Faculty getFacultyOfTheStudent(long id) {
+        if (id < 0) {
             throw new IllegalArgumentException("Требуется указать корректное имя студента");
         }
-        return this.studentRepository.getByNameIgnoreCase(name).getFaculty();
+        return this.studentRepository.findById(id).get().getFaculty();
     }
 }

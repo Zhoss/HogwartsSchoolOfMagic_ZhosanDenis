@@ -1,5 +1,6 @@
 package ru.hogwarts.school.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.Entity;
@@ -20,6 +21,7 @@ public class Faculty {
 
     @OneToMany(mappedBy = "faculty")
     @JsonManagedReference
+    @JsonIgnore
     private Collection<Student> students;
 
     public Faculty(Long id, String name, String color) {
@@ -52,7 +54,7 @@ public class Faculty {
         if (id >= 0) {
             this.id = id;
         } else {
-            throw new IllegalArgumentException("Требуется указать корректный ID факультета (>= 0 и < 10)");
+            throw new IllegalArgumentException("Требуется указать корректный ID факультета (>= 0)");
         }
     }
 
@@ -69,6 +71,14 @@ public class Faculty {
             this.color = color;
         } else {
             throw new IllegalArgumentException("Требуется указать корректный цвет факультета");
+        }
+    }
+
+    public void setStudents(Collection<Student> students) {
+        if (students != null) {
+            this.students = students;
+        } else {
+            throw new IllegalArgumentException("Требуется передать коллекцию студентов");
         }
     }
 

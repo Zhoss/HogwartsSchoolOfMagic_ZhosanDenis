@@ -57,10 +57,10 @@ public class FacultyService {
         return this.facultyRepository.findByNameIgnoreCase(name);
     }
 
-    public Collection<Student> findAllStudents(String name) {
-        if (name == null || name.isEmpty() || name.isBlank()) {
-            throw new IllegalArgumentException("Требуется указать корректное имя факультета");
+    public Collection<Student> findAllStudents(long id) {
+        if (id < 0) {
+            throw new IllegalArgumentException("Требуется указать корректный id факультета");
         }
-        return this.facultyRepository.findByNameIgnoreCase(name).getAllStudents();
+        return this.facultyRepository.findById(id).get().getAllStudents();
     }
 }

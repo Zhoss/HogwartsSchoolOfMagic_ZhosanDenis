@@ -71,12 +71,12 @@ public class StudentController {
     }
 
     @GetMapping("faculty")
-    public ResponseEntity<Faculty> getFacultyOfTheStudent(@RequestParam String name) {
-        Faculty faculty = this.service.getFacultyOfTheStudent(name);
-        if (faculty == null) {
+    public ResponseEntity<Faculty> getFacultyOfTheStudent(@RequestParam long id) {
+        Faculty foudFaculty = this.service.getFacultyOfTheStudent(id);
+        if (foudFaculty == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(this.service.getFacultyOfTheStudent(name));
+        return ResponseEntity.ok(foudFaculty);
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)

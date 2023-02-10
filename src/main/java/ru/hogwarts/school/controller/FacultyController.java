@@ -60,26 +60,29 @@ public class FacultyController {
     public ResponseEntity<Faculty> getFacultyByColorOrName(@RequestParam(required = false) String color,
                                                            @RequestParam(required = false) String name) {
         if (color != null) {
-            if (this.service.getFacultyByColor(color) == null) {
+            Faculty foundFacultyByColor = this.service.getFacultyByColor(color);
+            if (foundFacultyByColor == null) {
                 return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.ok(this.service.getFacultyByColor(color));
+            return ResponseEntity.ok(foundFacultyByColor);
         }
         if (name != null) {
-            if (this.service.getFacultyByName(name) == null) {
+            Faculty foundFacultyByName = this.service.getFacultyByName(name);
+            if (foundFacultyByName == null) {
                 return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.ok(this.service.getFacultyByName(name));
+            return ResponseEntity.ok(foundFacultyByName);
         }
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("students")
-    public ResponseEntity<Collection<Student>> findAllStudents(String name) {
-        if (this.service.findAllStudents(name).isEmpty()) {
+    public ResponseEntity<Collection<Student>> findAllStudents(@RequestParam long id) {
+        Collection<Student> students = this.service.findAllStudents(id);
+        if (students.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(this.service.findAllStudents(name));
+        return ResponseEntity.ok(students);
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)
