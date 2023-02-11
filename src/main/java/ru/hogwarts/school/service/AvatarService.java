@@ -7,6 +7,7 @@ import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.AvatarRepository;
 
+import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.BufferedInputStream;
@@ -20,6 +21,7 @@ import java.util.Objects;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Service
+@Transactional
 public class AvatarService {
     @Value("${students.avatar.dir.path}")
     private String avatarsDir;
