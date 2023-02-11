@@ -61,6 +61,6 @@ public class FacultyService {
         if (id < 0) {
             throw new IllegalArgumentException("Требуется указать корректный id факультета");
         }
-        return this.facultyRepository.findById(id).get().getAllStudents();
+        return this.facultyRepository.findById(id).get().getStudents();
     }
 }

@@ -21,7 +21,6 @@ public class Faculty {
 
     @OneToMany(mappedBy = "faculty")
     @JsonManagedReference
-    @JsonIgnore
     private Collection<Student> students;
 
     public Faculty(Long id, String name, String color) {
@@ -46,7 +45,7 @@ public class Faculty {
         return color;
     }
 
-    public Collection<Student> getAllStudents() {
+    public Collection<Student> getStudents() {
         return students;
     }
 
