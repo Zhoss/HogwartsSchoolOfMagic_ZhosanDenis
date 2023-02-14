@@ -78,8 +78,9 @@ public class Student {
     public void setFaculty(Faculty faculty) {
         if (faculty != null) {
             this.faculty = faculty;
+        } else {
+            throw new IllegalArgumentException("Требуется указать корректный факультет студента");
         }
-        throw new IllegalArgumentException("Требуется указать корректный факультет студента");
     }
 
     @Override
