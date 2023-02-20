@@ -6,6 +6,7 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @Service
 public class FacultyService {
@@ -26,7 +27,7 @@ public class FacultyService {
         if (id < 0) {
             throw new IllegalArgumentException("Требуется указать корректный ID факультета");
         }
-        return this.facultyRepository.findById(id).get();
+        return this.facultyRepository.findById(id).orElse(null);
     }
 
     public Faculty editFaculty(Faculty faculty) {
@@ -61,6 +62,6 @@ public class FacultyService {
         if (id < 0) {
             throw new IllegalArgumentException("Требуется указать корректный id факультета");
         }
-        return this.facultyRepository.findById(id).get().getStudents();
+        return Objects.requireNonNull(this.facultyRepository.findById(id).orElse(new Faculty())).getStudents();
     }
 }

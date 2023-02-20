@@ -1,6 +1,5 @@
 package ru.hogwarts.school.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.Entity;
@@ -99,6 +98,7 @@ public class Faculty {
         return "Факультет Хогвартс - " +
                 "ID: " + id +
                 ", название: " + name +
-                ", цвет: " + color;
+                ", цвет: " + color +
+                ", студенты " + students;
     }
 }
