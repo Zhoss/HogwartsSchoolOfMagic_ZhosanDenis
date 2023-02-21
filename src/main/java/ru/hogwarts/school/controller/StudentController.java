@@ -15,6 +15,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Collection;
 
 @RestController
@@ -77,6 +78,33 @@ public class StudentController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(foundFaculty);
+    }
+
+    @GetMapping("students")
+    public ResponseEntity<Integer> getAllStudentsInSchool() {
+        Integer studentsAmount = this.service.getAllStudentsInSchool();
+        if (studentsAmount == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(studentsAmount);
+    }
+
+    @GetMapping("age/average")
+    public ResponseEntity<Integer> getAverageAge() {
+        Integer studentsAverageAge = this.service.getAverageAge();
+        if (studentsAverageAge == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(studentsAverageAge);
+    }
+
+    @GetMapping("students/last5")
+    public ResponseEntity<Collection<Student>> getLastStudentsInList() {
+        Collection<Student> lastStudents = this.service.getLast5StudentsInList();
+        if (lastStudents.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(lastStudents);
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)

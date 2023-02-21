@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 @RestController
 public class AvatarController {
@@ -57,5 +58,29 @@ public class AvatarController {
             response.setContentLength((int) avatar.getFileSize());
             is.transferTo(os);
         }
+    }
+
+    @GetMapping(value = "students")
+    public void downloadAllAvatars(@RequestParam(name = "page") Integer pageNumber,
+                                                           @RequestParam(name = "size") Integer pageSize,
+                                                           HttpServletResponse response) throws IOException {
+        List<Avatar> allAvatars = this.avatarService.findAllAvatars(pageNumber, pageSize);
+
+        for (Avatar avatar : allAvatars) {
+            Path path = Path.of(avatar.getFilePath());
+
+            try (InputStream is = Files.newInputStream(path);
+                 OutputStream os = response.getOutputStream()) {
+                response.setStatus(200);
+                response.setContentType(avatar.getMediaType());
+                response.setContentLength((int) avatar.getFileSize());
+                is.transferTo(os);
+            }
+        }
+    }
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

@@ -63,4 +63,16 @@ public class StudentService {
         }
         return this.studentRepository.findById(id).get().getFaculty();
     }
+
+    public Integer getAllStudentsInSchool() {
+        return this.studentRepository.findAllStudents();
+    }
+
+    public Integer getAverageAge() {
+        return this.studentRepository.findAverageAge();
+    }
+
+    public Collection<Student> getLast5StudentsInList() {
+        return this.studentRepository.getLast5StudentsInList();
+    }
 }
