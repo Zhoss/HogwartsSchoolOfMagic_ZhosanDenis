@@ -15,7 +15,6 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Collection;
 
 @RestController

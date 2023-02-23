@@ -15,9 +15,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import ru.hogwarts.school.controller.FacultyController;
+import ru.hogwarts.school.controller.StudentController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
+import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,10 @@ public class HogwartsSchoolApplicationFacultyTests {
     private FacultyRepository facultyRepository;
     @Autowired
     private FacultyController facultyController;
+    @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
+    private StudentController studentController;
     @Autowired
     private TestRestTemplate restTemplate;
     private final long facultyId = 1L;
@@ -77,10 +83,11 @@ public class HogwartsSchoolApplicationFacultyTests {
 
     @Test
     void testGetFaculty() throws Exception {
-        createFacultyGryffindor();
+        Faculty createdFaculty = createFacultyGryffindor().getBody();
 
+        assert createdFaculty != null;
         ResponseEntity<Faculty> response = this.restTemplate.getForEntity(
-                "http://localhost:" + this.port + "/faculty/" + facultyId, Faculty.class);
+                "http://localhost:" + this.port + "/faculty/" + createdFaculty.getId(), Faculty.class);
 
         Assertions
                 .assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -96,27 +103,25 @@ public class HogwartsSchoolApplicationFacultyTests {
 
     @Test
     void testEditFaculty() throws Exception {
-        createFacultyGryffindor();
+        Faculty createdFaculty = createFacultyGryffindor().getBody();
 
-        Faculty newFaculty = new Faculty();
-        newFaculty.setId(1L);
-        newFaculty.setName("Слизерин");
-        newFaculty.setColor("Зеленый");
-        newFaculty.setStudents(new ArrayList<>());
+        assert createdFaculty != null;
+        createdFaculty.setName("Слизерин");
+        createdFaculty.setColor("зеленый");
 
-        this.restTemplate.put("http://localhost:" + this.port + "/faculty", newFaculty, Faculty.class);
+        this.restTemplate.put("http://localhost:" + this.port + "/faculty", createdFaculty, Faculty.class);
 
         ResponseEntity<Faculty> response = this.restTemplate.getForEntity(
-                "http://localhost:" + this.port + "/faculty/" + facultyId, Faculty.class);
+                "http://localhost:" + this.port + "/faculty/" + createdFaculty.getId(), Faculty.class);
 
         Assertions
                 .assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions
                 .assertThat(response.getBody()).isNotNull();
         Assertions
-                .assertThat(response.getBody().getName()).isEqualTo(newFaculty.getName());
+                .assertThat(response.getBody().getName()).isEqualTo(createdFaculty.getName());
         Assertions
-                .assertThat(response.getBody().getColor()).isEqualTo(newFaculty.getColor());
+                .assertThat(response.getBody().getColor()).isEqualTo(createdFaculty.getColor());
         Assertions
                 .assertThat(response.getBody().getId()).isNotNull();
     }
@@ -192,35 +197,53 @@ public class HogwartsSchoolApplicationFacultyTests {
 
     @Test
     void testFindAllStudents() {
-        ResponseEntity<Faculty> facultyResponseEntity = createFacultyGryffindor();
-        Faculty gryffindor = facultyResponseEntity.getBody();
-        System.out.println(gryffindor);
+        Student harry = new Student(1L, "Harry Potter", 12, new Faculty());
 
-        Student harry = new Student(1L, "Harry Potter", 12, gryffindor);
-        Student ron = new Student(2L, "Ron Weasley", 12, gryffindor);
+        ResponseEntity<Student> responseHarry = this.restTemplate.postForEntity(
+                "http://localhost:" + this.port + "/student", harry, Student.class);
 
-        assert gryffindor != null;
-        gryffindor.setStudents(new ArrayList<>(List.of(harry, ron)));
-        System.out.println(gryffindor);
+        System.out.println("1: " + responseHarry.getBody());
+        System.out.println("2: Факультет Гарри - " + Objects.requireNonNull(responseHarry.getBody()).getFaculty());
 
-        List<Student> students = new ArrayList<>(List.of(harry, ron));
-        System.out.println(students);
+        Faculty gryffindor = new Faculty(facultyId, facultyName, facultyColor);
+        gryffindor.setStudents(new ArrayList<>(List.of(harry)));
 
-        Long id = facultyId;
-        ParameterizedTypeReference<List<Student>> typeRef = new ParameterizedTypeReference<List<Student>>() {
-        };
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<?> httpEntity = new HttpEntity<>(headers);
+        ResponseEntity<Faculty> responseGryffindor = this.restTemplate.postForEntity(
+                "http://localhost:" + this.port + "/faculty", gryffindor, Faculty.class);
+
+        System.out.println("3: " + responseGryffindor.getBody());
+
+        harry.setId(Objects.requireNonNull(responseHarry.getBody()).getId());
+        harry.setFaculty(gryffindor);
+
+        this.restTemplate.put("http://localhost:" + this.port + "/student", harry, Student.class);
+
+        ResponseEntity<Student> responseHarry1 = this.restTemplate.getForEntity(
+                "http://localhost:" + this.port + "/student/" + harry.getId(), Student.class);
+
+        System.out.println("4: " + responseHarry1.getBody());
+        System.out.println("5: Факультет Гарри - " + Objects.requireNonNull(responseHarry1.getBody()).getFaculty());
+
+        gryffindor.setId(Objects.requireNonNull(responseGryffindor.getBody()).getId());
+
+        ResponseEntity<Faculty> response1 = this.restTemplate.getForEntity(
+                "http://localhost:" + this.port + "/faculty/" + gryffindor.getId(), Faculty.class);
+
+        System.out.println("6: " + response1.getBody());
+
+        List<Student> students = new ArrayList<>(List.of(harry));
+
+        Long id = gryffindor.getId();
 
         ResponseEntity<List<Student>> response = this.restTemplate.exchange(
                 "http://localhost:" + this.port + "/faculty/students?id={id}",
                 HttpMethod.GET,
-                httpEntity,
-                typeRef,
-                id.toString());
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<>() {
+                },
+                id);
 
-        System.out.println(response);
+        System.out.println("7: Список студентов Гриффиндор " + response.getBody());
 
         Assertions
                 .assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
