@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,6 +74,16 @@ public class AvatarService {
             throw new IllegalArgumentException("Требуется указать корректное номер и размер страницы");
         }
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
-        return this.avatarRepository.findAll(pageRequest).getContent();
+        List<Avatar> allAvatars = this.avatarRepository.findAll(pageRequest).getContent();
+        List<Avatar> allAvatarsWithoutData = new ArrayList<>();
+        for (Avatar avatar : allAvatars) {
+            Avatar avatarWithoutData = new Avatar(avatar.getId(),
+                    avatar.getFilePath(),
+                    avatar.getFileSize(),
+                    avatar.getMediaType(),
+                    avatar.getStudent());
+            allAvatarsWithoutData.add(avatarWithoutData);
+        }
+        return allAvatarsWithoutData;
     }
 }

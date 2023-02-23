@@ -1,5 +1,6 @@
 package ru.hogwarts.school.controller;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -61,22 +63,13 @@ public class AvatarController {
     }
 
     @GetMapping(value = "students")
-    public void downloadAllAvatars(@RequestParam(name = "page") Integer pageNumber,
-                                                           @RequestParam(name = "size") Integer pageSize,
-                                                           HttpServletResponse response) throws IOException {
+    public ResponseEntity<List<Avatar>> getAllAvatars(@RequestParam(name = "page") Integer pageNumber,
+                                                      @RequestParam(name = "size") Integer pageSize) throws IOException {
         List<Avatar> allAvatars = this.avatarService.findAllAvatars(pageNumber, pageSize);
-
-        for (Avatar avatar : allAvatars) {
-            Path path = Path.of(avatar.getFilePath());
-
-            try (InputStream is = Files.newInputStream(path);
-                 OutputStream os = response.getOutputStream()) {
-                response.setStatus(200);
-                response.setContentType(avatar.getMediaType());
-                response.setContentLength((int) avatar.getFileSize());
-                is.transferTo(os);
-            }
+        if (allAvatars.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(allAvatars);
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)
