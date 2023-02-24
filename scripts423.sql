@@ -1,6 +1,6 @@
 SELECT students.name, students.age, faculty.name
 FROM students
-INNER JOIN faculty ON students.faculty_id = faculty.id;
+LEFT JOIN faculty ON students.faculty_id = faculty.id;
 
 SELECT students.name, students.age, avatar.file_path
 FROM students

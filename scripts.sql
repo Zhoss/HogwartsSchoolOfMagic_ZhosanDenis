@@ -1,11 +1,11 @@
-select * from student;
+select * from students;
 
-select * from student where age >= 11 and age < 13;
+select * from students where age >= 11 and age < 13;
 
-select name from student;
+select name from students;
 
-select * from student where name like ('%г%');
+select * from students where name like ('%г%');
 
-select * from student where age < id;
+select * from students where age < id;
 
-select * from student order by age;
+select * from students order by age;
