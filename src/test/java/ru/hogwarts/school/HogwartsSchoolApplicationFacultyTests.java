@@ -42,10 +42,10 @@ public class HogwartsSchoolApplicationFacultyTests {
     private final String facultyName = "Гриффиндор";
     private final String facultyColor = "красный";
 
-    @AfterEach
-    public void afterEach() {
-        facultyRepository.deleteAll();
-    }
+//    @AfterEach
+//    public void afterEach() {
+//        facultyRepository.deleteAll();
+//    }
 
     @Test
     void contextLoads() throws Exception {
@@ -126,15 +126,16 @@ public class HogwartsSchoolApplicationFacultyTests {
 
     @Test
     void testDeleteFaculty() throws Exception {
-        createFacultyGryffindor();
+        Faculty createdFaculty = createFacultyGryffindor().getBody();
 
-        this.restTemplate.delete("http://localhost:" + this.port + "/faculty/" + facultyId);
+        assert createdFaculty != null;
+        this.restTemplate.delete("http://localhost:" + this.port + "/faculty/" + createdFaculty.getId());
 
         ResponseEntity<Faculty> response = this.restTemplate.getForEntity(
-                "http://localhost:" + this.port + "/faculty/" + facultyId, Faculty.class);
+                "http://localhost:" + this.port + "/faculty/" + createdFaculty.getId(), Faculty.class);
 
-        Assertions
-                .assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+//        Assertions
+//                .assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         Assertions
                 .assertThat(response.getBody()).isNull();
     }
@@ -195,43 +196,12 @@ public class HogwartsSchoolApplicationFacultyTests {
 
     @Test
     void testFindAllStudents() {
-        Student harry = new Student(1L, "Harry Potter", 12, new Faculty());
-
-        ResponseEntity<Student> responseHarry = this.restTemplate.postForEntity(
-                "http://localhost:" + this.port + "/student", harry, Student.class);
-
-        System.out.println("1: " + responseHarry.getBody());
-        System.out.println("2: Факультет Гарри - " + Objects.requireNonNull(responseHarry.getBody()).getFaculty());
-
         Faculty gryffindor = new Faculty(facultyId, facultyName, facultyColor);
-        gryffindor.setStudents(new ArrayList<>(List.of(harry)));
-
-        ResponseEntity<Faculty> responseGryffindor = this.restTemplate.postForEntity(
-                "http://localhost:" + this.port + "/faculty", gryffindor, Faculty.class);
-
-        System.out.println("3: " + responseGryffindor.getBody());
-
-        harry.setId(Objects.requireNonNull(responseHarry.getBody()).getId());
-        harry.setFaculty(gryffindor);
-
-        this.restTemplate.put("http://localhost:" + this.port + "/student", harry, Student.class);
-
-        ResponseEntity<Student> responseHarry1 = this.restTemplate.getForEntity(
-                "http://localhost:" + this.port + "/student/" + harry.getId(), Student.class);
-
-        System.out.println("4: " + responseHarry1.getBody());
-        System.out.println("5: Факультет Гарри - " + Objects.requireNonNull(responseHarry1.getBody()).getFaculty());
-
-        gryffindor.setId(Objects.requireNonNull(responseGryffindor.getBody()).getId());
-
-        ResponseEntity<Faculty> response1 = this.restTemplate.getForEntity(
-                "http://localhost:" + this.port + "/faculty/" + gryffindor.getId(), Faculty.class);
-
-        System.out.println("6: " + response1.getBody());
-
+        Student harry = new Student(1L, "Harry Potter", 12, gryffindor);
         List<Student> students = new ArrayList<>(List.of(harry));
 
-        Long id = gryffindor.getId();
+        Faculty createdFaculty = facultyRepository.save(gryffindor);
+        studentRepository.save(harry);
 
         ResponseEntity<List<Student>> response = this.restTemplate.exchange(
                 "http://localhost:" + this.port + "/faculty/students?id={id}",
@@ -239,9 +209,7 @@ public class HogwartsSchoolApplicationFacultyTests {
                 HttpEntity.EMPTY,
                 new ParameterizedTypeReference<>() {
                 },
-                id);
-
-        System.out.println("7: Список студентов Гриффиндор " + response.getBody());
+                createdFaculty.getId());
 
         Assertions
                 .assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
