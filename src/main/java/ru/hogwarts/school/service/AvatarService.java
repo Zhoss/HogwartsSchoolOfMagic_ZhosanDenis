@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -28,9 +30,9 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 public class AvatarService {
     @Value("${students.avatar.dir.path}")
     private String avatarsDir;
-
     private final StudentService studentService;
     private final AvatarRepository avatarRepository;
+    private final static Logger logger = LoggerFactory.getLogger(AvatarService.class);
 
     public AvatarService(StudentService studentService, AvatarRepository avatarRepository) {
         this.studentService = studentService;
@@ -39,6 +41,7 @@ public class AvatarService {
 
     public void uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
         Student student = studentService.getStudent(studentId);
+        logger.debug("Found student " + student.getName() + " with input id = " + studentId);
 
         Path filePath = Path.of(avatarsDir, studentId + "." + getExtensions(Objects.requireNonNull(avatarFile.getOriginalFilename())));
         Files.createDirectories(filePath.getParent());
@@ -59,9 +62,11 @@ public class AvatarService {
         avatar.setMediaType(avatarFile.getContentType());
         avatar.setData(avatarFile.getBytes());
         this.avatarRepository.save(avatar);
+        logger.info("Was invoked method for upload avatar of student");
     }
 
     public Avatar findAvatar(Long studentId) {
+        logger.info("Was invoked method for download avatar of student");
         return avatarRepository.findByStudentId(studentId).orElse(new Avatar());
     }
 
@@ -71,6 +76,7 @@ public class AvatarService {
 
     public List<Avatar> findAllAvatars(Integer pageNumber, Integer pageSize) {
         if (pageNumber < 0 || pageSize < 0) {
+            logger.error("Input page number or page size is out of range");
             throw new IllegalArgumentException("Требуется указать корректное номер и размер страницы");
         }
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
@@ -84,6 +90,7 @@ public class AvatarService {
                     avatar.getStudent());
             allAvatarsWithoutData.add(avatarWithoutData);
         }
+        logger.info("Was invoked method for getting avatars of all students with avatars");
         return allAvatarsWithoutData;
     }
 }

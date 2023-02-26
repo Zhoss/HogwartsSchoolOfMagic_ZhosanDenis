@@ -1,7 +1,6 @@
 package ru.hogwarts.school;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,11 +40,6 @@ public class HogwartsSchoolApplicationFacultyTests {
     private final long facultyId = 1L;
     private final String facultyName = "Гриффиндор";
     private final String facultyColor = "красный";
-
-//    @AfterEach
-//    public void afterEach() {
-//        facultyRepository.deleteAll();
-//    }
 
     @Test
     void contextLoads() throws Exception {
@@ -134,8 +128,8 @@ public class HogwartsSchoolApplicationFacultyTests {
         ResponseEntity<Faculty> response = this.restTemplate.getForEntity(
                 "http://localhost:" + this.port + "/faculty/" + createdFaculty.getId(), Faculty.class);
 
-//        Assertions
-//                .assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        Assertions
+                .assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         Assertions
                 .assertThat(response.getBody()).isNull();
     }
@@ -191,7 +185,6 @@ public class HogwartsSchoolApplicationFacultyTests {
                 .assertThat(responseSlytherin.getBody().getColor()).isEqualTo(slytherin.getColor());
         Assertions
                 .assertThat(responseSlytherin.getBody().getId()).isNotNull();
-
     }
 
     @Test
@@ -219,5 +212,7 @@ public class HogwartsSchoolApplicationFacultyTests {
                 .assertThat(response.getBody()).isNotEmpty();
         Assertions
                 .assertThat(response.getBody()).isEqualTo(students);
+
+        studentRepository.deleteAll();
     }
 }
