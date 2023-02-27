@@ -106,6 +106,24 @@ public class StudentController {
         return ResponseEntity.ok(lastStudents);
     }
 
+    @GetMapping("students/nameStarts/{letter}")
+    public ResponseEntity<Collection<String>> getStudentsWithNamesStartingWithLetter(@PathVariable Character letter) {
+        Collection<String> students = this.service.getStudentsWithNamesStartingWithLetter(letter);
+        if (students.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(students);
+    }
+
+    @GetMapping("students/age/average")
+    public ResponseEntity<Double> getAverageAgeOfAllStudents() {
+        Double studentsAverageAge = this.service.getAverageAgeOfAllStudents();
+        if (studentsAverageAge == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(studentsAverageAge);
+    }
+
     @ExceptionHandler(value = IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
