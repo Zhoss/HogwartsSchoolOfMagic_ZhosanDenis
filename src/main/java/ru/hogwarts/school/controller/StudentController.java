@@ -15,6 +15,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
@@ -89,8 +90,8 @@ public class StudentController {
     }
 
     @GetMapping("age/average")
-    public ResponseEntity<Integer> getAverageAge() {
-        Integer studentsAverageAge = this.service.getAverageAge();
+    public ResponseEntity<Double> getAverageAge() {
+        Double studentsAverageAge = this.service.getAverageAge();
         if (studentsAverageAge == null) {
             return ResponseEntity.notFound().build();
         }
@@ -110,7 +111,7 @@ public class StudentController {
     public ResponseEntity<Collection<String>> getStudentsWithNamesStartingWithLetter(@PathVariable Character letter) {
         Collection<String> students = this.service.getStudentsWithNamesStartingWithLetter(letter);
         if (students.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(new ArrayList<>());
         }
         return ResponseEntity.ok(students);
     }
@@ -118,10 +119,20 @@ public class StudentController {
     @GetMapping("students/age/average")
     public ResponseEntity<Double> getAverageAgeOfAllStudents() {
         Double studentsAverageAge = this.service.getAverageAgeOfAllStudents();
-        if (studentsAverageAge == null) {
+        if (studentsAverageAge == 0) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(studentsAverageAge);
+    }
+
+    @GetMapping("/students/thread/")
+    public void printAllStudentsInThreads() {
+        this.service.printAllStudentsInThreads();
+    }
+
+    @GetMapping("/students/threadSynchronized/")
+    public void printAllStudentsInThreadsSynchronized() {
+        this.service.printAllStudentsInThreadsSynchronized();
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)

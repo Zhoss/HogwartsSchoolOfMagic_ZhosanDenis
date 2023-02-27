@@ -8,6 +8,7 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -88,7 +89,7 @@ public class StudentService {
         return this.studentRepository.findNumberOfAllStudents();
     }
 
-    public Integer getAverageAge() {
+    public Double getAverageAge() {
         logger.info("Was invoked method for getting average age of all students in school");
         return this.studentRepository.findAverageAge();
     }
@@ -109,6 +110,60 @@ public class StudentService {
     public Double getAverageAgeOfAllStudents() {
         return this.studentRepository.findAll().stream()
                 .mapToDouble(Student::getAge)
-                .average().getAsDouble();
+                .average().orElse(0);
+    }
+
+    public void printAllStudentsInThreads() {
+        List<Student> students = this.studentRepository.findAll();
+
+        printStudent(students.get(0));
+        printStudent(students.get(1));
+
+        new Thread(() -> {
+            printStudent(students.get(2));
+            printStudent(students.get(3));
+        }).start();
+
+        new Thread(() -> {
+            printStudent(students.get(4));
+            printStudent(students.get(5));
+        }).start();
+    }
+
+    public synchronized void printAllStudentsInThreadsSynchronized() {
+        List<Student> students = this.studentRepository.findAll();
+
+        printStudentSynchronized(students.get(0));
+        printStudentSynchronized(students.get(1));
+
+        new Thread(() -> {
+            printStudentSynchronized(students.get(2));
+            printStudentSynchronized(students.get(3));
+        }).start();
+
+        new Thread(() -> {
+            printStudentSynchronized(students.get(4));
+            printStudentSynchronized(students.get(5));
+        }).start();
+    }
+
+    private void printStudent(Student student) {
+        System.out.println("Студент " + student.getId() + " - " + student.getName());
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            System.out.println("Thread interrupted");
+        }
+    }
+
+    private synchronized void printStudentSynchronized(Student student) {
+        System.out.println("Студент " + student.getId() + " - " + student.getName());
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            System.out.println("Thread interrupted");
+        }
     }
 }
