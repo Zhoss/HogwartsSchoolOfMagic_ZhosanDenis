@@ -91,8 +91,7 @@ public class FacultyService {
 
     public String findLongestFacultyName() {
         return this.facultyRepository.findAll().stream()
-                .sorted(Comparator.comparing(Faculty::getName))
                 .map(Faculty::getName)
-                .findFirst().get();
+                .max(Comparator.comparing(String::length)).orElse("");
     }
 }
