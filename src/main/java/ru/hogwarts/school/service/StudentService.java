@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class StudentService {
     private final StudentRepository studentRepository;
     private final static Logger logger = LoggerFactory.getLogger(StudentService.class);
+    private static int index = 0;
 
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
@@ -131,39 +132,47 @@ public class StudentService {
     }
 
     public synchronized void printAllStudentsInThreadsSynchronized() {
-        List<Student> students = this.studentRepository.findAll();
+        List<Student> students = this.studentRepository.findAll().stream()
+                .filter(s -> s.getId() < 7)
+                .collect(Collectors.toList());
 
-        printStudentSynchronized(students.get(0));
-        printStudentSynchronized(students.get(1));
+        printStudentSynchronized(students);
+        printStudentSynchronized(students);
 
         new Thread(() -> {
-            printStudentSynchronized(students.get(2));
-            printStudentSynchronized(students.get(3));
+            printStudentSynchronized(students);
+            printStudentSynchronized(students);
         }).start();
 
         new Thread(() -> {
-            printStudentSynchronized(students.get(4));
-            printStudentSynchronized(students.get(5));
+            printStudentSynchronized(students);
+            printStudentSynchronized(students);
         }).start();
     }
 
     private void printStudent(Student student) {
+        logger.info("Was invoked method for print student in threads");
         System.out.println("Студент " + student.getId() + " - " + student.getName());
 
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
+            logger.error("Thread interrupted");
             System.out.println("Thread interrupted");
         }
     }
 
-    private synchronized void printStudentSynchronized(Student student) {
+    private synchronized void printStudentSynchronized(List<Student> students) {
+        logger.info("Was invoked method for print student in synchronized threads");
+        Student student = students.get(index % students.size());
         System.out.println("Студент " + student.getId() + " - " + student.getName());
 
         try {
-            Thread.sleep(3000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
-            System.out.println("Thread interrupted");
+            logger.error("Synchronized thread interrupted");
+            System.out.println("Synchronized thread interrupted");
         }
+        index++;
     }
 }

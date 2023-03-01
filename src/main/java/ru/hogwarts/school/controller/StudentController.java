@@ -110,9 +110,6 @@ public class StudentController {
     @GetMapping("students/nameStarts/{letter}")
     public ResponseEntity<Collection<String>> getStudentsWithNamesStartingWithLetter(@PathVariable Character letter) {
         Collection<String> students = this.service.getStudentsWithNamesStartingWithLetter(letter);
-        if (students.isEmpty()) {
-            return ResponseEntity.ok(new ArrayList<>());
-        }
         return ResponseEntity.ok(students);
     }
 
@@ -125,12 +122,12 @@ public class StudentController {
         return ResponseEntity.ok(studentsAverageAge);
     }
 
-    @GetMapping("/students/thread/")
+    @GetMapping("/students/thread")
     public void printAllStudentsInThreads() {
         this.service.printAllStudentsInThreads();
     }
 
-    @GetMapping("/students/threadSynchronized/")
+    @GetMapping("/students/threadSynchronized")
     public void printAllStudentsInThreadsSynchronized() {
         this.service.printAllStudentsInThreadsSynchronized();
     }
